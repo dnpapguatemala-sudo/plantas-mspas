@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Plantas Medicinales MSPAS</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:system-ui,-apple-system,sans-serif;background:#F2F7F0;min-height:100vh}
+
+/* ── HEADER ── */
+.hdr{background:#1F3864}
+.hdr-top{display:flex;align-items:center;gap:10px;padding:13px 14px 9px}
+.logo{width:38px;height:38px;min-width:38px;background:#27500A;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #C0DD97;font-size:19px}
+.hdr-title{font-size:14px;font-weight:700;color:#fff;line-height:1.2}
+.hdr-sub{font-size:10px;color:#97C459;margin-top:1px}
+.swrap{padding:0 14px 12px}
+.sbox{display:flex;align-items:center;border-radius:22px;border:2px solid #27500A;background:#fff;box-shadow:0 0 0 3px #97C45940}
+.si{padding:0 8px 0 12px;font-size:16px;color:#27500A}
+.sbox input{flex:1;border:none;outline:none;font-size:13px;color:#173404;padding:9px 4px;background:transparent}
+.sbox input::placeholder{color:#97C459}
+.sclr{padding:0 12px;color:#97C459;font-size:16px;cursor:pointer;display:none}
+.frow{padding:0 14px 10px;display:flex;gap:5px;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+.frow::-webkit-scrollbar{display:none}
+.fb{flex-shrink:0;padding:4px 11px;border-radius:18px;border:1.5px solid #27500A;background:#fff;color:#27500A;font-size:10px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s}
+.fb.on{background:#27500A;color:#C0DD97}
+
+/* ── GRID ── */
+.cbar{padding:2px 14px 8px;font-size:11px;color:#639922;font-weight:600}
+.grid{padding:0 10px 90px;display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+@media(min-width:480px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(min-width:768px){.grid{grid-template-columns:repeat(4,1fr);padding:0 16px 80px}}
+@media(min-width:1024px){.grid{grid-template-columns:repeat(5,1fr)}}
+
+/* ── TARJETA ── */
+.card{border-radius:13px;overflow:hidden;border:1px solid #C0DD97;background:#fff;cursor:pointer;transition:transform .15s,border-color .15s;display:flex;flex-direction:column}
+.card:hover{transform:translateY(-2px);border-color:#3B6D11}
+.card:active{transform:scale(.97)}
+.cimg{width:100%;aspect-ratio:1/1;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.cimg img{width:100%;height:100%;object-fit:cover;display:block}
+.cph{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px}
+.cph i{font-size:34px}
+.cph span{font-size:9px}
+/* indicador de ficha disponible */
+.ficha-badge{position:absolute;bottom:6px;right:6px;background:#27500A;color:#C0DD97;font-size:8px;font-weight:700;padding:2px 7px;border-radius:8px;display:flex;align-items:center;gap:3px}
+.ficha-badge i{font-size:10px}
+.cbody{padding:8px 10px 10px;flex:1;display:flex;flex-direction:column}
+.cnum{font-size:8px;color:#639922;font-weight:700}
+.cname{font-size:12px;font-weight:700;color:#173404;line-height:1.25;margin-bottom:1px}
+.csci{font-size:8px;color:#3B6D11;font-style:italic;margin-bottom:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ctags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:6px}
+.ptag{font-size:7px;padding:2px 5px;border-radius:8px;font-weight:700;white-space:nowrap}
+.clink{display:inline-flex;align-items:center;gap:2px;font-size:8px;color:#1F3864;border:1px solid #1F3864;border-radius:8px;padding:2px 6px;text-decoration:none;font-weight:700;margin-top:auto;width:fit-content}
+.clink i{font-size:10px}
+
+/* ── LIGHTBOX FICHA ── */
+.lb{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,.92);flex-direction:column}
+.lb.open{display:flex}
+/* barra superior */
+.lb-bar{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(0,0,0,.6);gap:10px}
+.lb-info{flex:1;min-width:0}
+.lb-num{font-size:10px;color:#97C459;font-weight:700}
+.lb-name{font-size:15px;font-weight:700;color:#fff;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-sci{font-size:11px;color:#C0DD97;font-style:italic}
+.lb-back{display:flex;align-items:center;gap:6px;background:#27500A;border:none;color:#C0DD97;font-size:12px;font-weight:700;padding:7px 13px;border-radius:20px;cursor:pointer;flex-shrink:0;white-space:nowrap}
+.lb-back i{font-size:15px}
+.lb-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:34px;height:34px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+/* zona imagen */
+.lb-img-wrap{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:8px;-webkit-overflow-scrolling:touch}
+.lb-img-wrap img{max-width:100%;height:auto;border-radius:10px;display:block}
+/* placeholder si no hay ficha */
+.lb-placeholder{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#fff}
+.lb-placeholder i{font-size:60px;color:#639922}
+.lb-placeholder p{font-size:14px;color:#97C459;text-align:center;padding:0 24px;line-height:1.6}
+/* barra inferior */
+.lb-foot{flex-shrink:0;padding:10px 14px 14px;background:rgba(0,0,0,.6);display:flex;gap:8px;flex-wrap:wrap}
+.lbtn{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;font-weight:700;padding:10px 8px;border-radius:10px;text-decoration:none;border:none;cursor:pointer;white-space:nowrap}
+.lbtn i{font-size:14px}
+.lbtn-norm{background:#1F3864;color:#fff}
+.lbtn-wa{background:#25D366;color:#fff}
+.lbtn-mail{background:#fff;color:#1F3864;border:1.5px solid #1F3864}
+.lbtn-dl{background:#27500A;color:#C0DD97}
+
+/* ── MODAL SIN FICHA (fallback) ── */
+.nf-modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.55);align-items:flex-end;justify-content:center}
+.nf-modal.open{display:flex}
+.nf-box{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:440px;padding:20px 18px 30px}
+.nf-box h3{font-size:17px;font-weight:700;color:#173404;margin-bottom:4px}
+.nf-box p{font-size:12px;color:#639922;margin-bottom:14px}
+.nf-close{float:right;background:none;border:none;font-size:20px;color:#97C459;cursor:pointer;margin-top:-4px}
+.nf-row{display:flex;gap:8px}
+.nfbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11px;font-weight:700;padding:10px;border-radius:10px;text-decoration:none;border:none;cursor:pointer}
+.nfbtn i{font-size:13px}
+</style>
+</head>
+<body>
+
+<!-- APP -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="logo">🌿</div>
+    <div>
+      <div class="hdr-title">Plantas Medicinales MSPAS</div>
+      <div class="hdr-sub">Normativa NCPMICC · Módulo 8 · Guatemala</div>
+    </div>
+  </div>
+  <div class="swrap">
+    <div class="sbox">
+      <i class="ti ti-search si" aria-hidden="true"></i>
+      <input type="text" id="srch" placeholder="Buscar planta o nombre científico…" oninput="onSrch(this.value)">
+      <span class="sclr" id="clr" onclick="clrSrch()"><i class="ti ti-x" aria-hidden="true"></i></span>
+    </div>
+  </div>
+  <div class="frow" id="frow"></div>
+</div>
+<div class="cbar" id="cbar"></div>
+<div class="grid" id="grid"></div>
+
+<!-- LIGHTBOX FICHA -->
+<div class="lb" id="lb">
+  <div class="lb-bar">
+    <button class="lb-back" onclick="closeLb()" aria-label="Volver al menú">
+      <i class="ti ti-arrow-left" aria-hidden="true"></i>Menú
+    </button>
+    <div class="lb-info">
+      <div class="lb-num" id="lbNum"></div>
+      <div class="lb-name" id="lbName"></div>
+      <div class="lb-sci" id="lbSci"></div>
+    </div>
+    <button class="lb-close" onclick="closeLb()" aria-label="Cerrar">
+      <i class="ti ti-x" aria-hidden="true"></i>
+    </button>
+  </div>
+  <div class="lb-img-wrap" id="lbImgWrap"></div>
+  <div class="lb-foot" id="lbFoot"></div>
+  <div style="padding:0 14px 10px">
+    <button onclick="closeLb()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.25);color:#fff;font-size:13px;font-weight:700;padding:11px;border-radius:12px;cursor:pointer;">
+      <i class="ti ti-arrow-left" aria-hidden="true" style="font-size:16px"></i>Volver al menu de plantas
+    </button>
+  </div>
+</div>
+
+<script>
+const C={
+  Digestivo:["#EAF3DE","#27500A"],
+  Respiratorio:["#E6F1FB","#0C447C"],
+  Piel:["#FAECE7","#712B13"],
+  Urinario:["#EEEDFE","#3C3489"],
+  Nervioso:["#FAEEDA","#633806"],
+  "Ginecológico":["#FBEAF0","#72243E"],
+  Inmune:["#D3F4E8","#085041"],
+  Cardiovascular:["#FCEBEB","#791F1F"]
+};
+const EM=["ti-leaf","ti-plant-2","ti-seeding","ti-trees","ti-flower","ti-cannabis","ti-herb","ti-plant"];
+
+// ══════════════════════════════════════════════════════════
+//  PLANTAS
+//  img   → foto cuadrada para la tarjeta    → carpeta img/
+//  ficha → infografía completa a mostrar    → carpeta fichas/
+//
+//  Ejemplo Google Drive:
+//    ficha:"https://drive.google.com/uc?export=view&id=TU_ID"
+//  Ejemplo GitHub:
+//    ficha:"fichas/achiote.jpg"
+//  Sin ficha aún:
+//    ficha:""   (muestra botones de compartir igualmente)
+// ══════════════════════════════════════════════════════════
+const P=[
+{no:"01",n:"Achiote",         s:"Bixa Orellana",          o:"Anero, Bija, Kuxub, Ox",                     c:["Piel","Urinario"],         pg:107, img:"achiote.jpg",          ficha:"fichas/achiote.jpg"},
+{no:"02",n:"Ajenjo",          s:"Artemisa absinthium",     o:"Alosna, Té Ruso",                            c:["Digestivo","Ginecológico"], pg:107, img:"ajenjo.jpg",           ficha:"fichas/ajenjo.jpg"},
+{no:"03",n:"Ajo",             s:"Allium sativum",          o:"Ajete, puerro, rocambola",                   c:["Respiratorio","Cardiovascular","Inmune"], pg:108, img:"ajo.jpg", ficha:"fichas/ajo.jpg"},
+{no:"04",n:"Albahaca",        s:"Ocimum basilicum",        o:"Albahaca de Castilla, Cacaltun",             c:["Digestivo","Piel"],         pg:108, img:"albahaca.jpg",         ficha:"fichas/albahaca.jpg"},
+{no:"05",n:"Alcotán",         s:"Cissampelos pareira",     o:"Curarina, Cuxbá, Cuxogui, Guaco",           c:["Piel"],                     pg:109, img:"alcotan.jpg",          ficha:"fichas/alcotan.jpg"},
+{no:"06",n:"Altamisa",        s:"Tanacetum parthenium",    o:"Artemisa, Chusita, Margarita, Santa María",  c:["Nervioso","Ginecológico"],  pg:109, img:"altamisa.jpg",         ficha:"fichas/altamisa.jpg"},
+{no:"07",n:"Amargón",         s:"Taraxacum officinale",    o:"Achicoria, Botón de oro, Diente de león",    c:["Digestivo","Urinario"],     pg:109, img:"amaragon.jpg",         ficha:"fichas/amaragon.jpg"},
+{no:"08",n:"Anís",            s:"Pimpinella anisum",       o:"Anix, Anís verde",                           c:["Digestivo","Respiratorio"], pg:110, img:"anis.jpg",             ficha:"fichas/anis.jpg"},
+{no:"09",n:"Apacín",          s:"Petiveria alliacea",      o:"Anamú, Hierba de Gallinitas, Zorrillo",      c:["Digestivo","Piel"],         pg:110, img:"apacin.jpg",           ficha:"fichas/apacin.jpg"},
+{no:"10",n:"Apazote",         s:"Teloxys ambrosioides",    o:"Epazote, Much, Quenopodio, Siquij",          c:["Digestivo","Piel"],         pg:111, img:"apazote.jpg",          ficha:"fichas/apazote.jpg"},
+{no:"11",n:"Boldo",           s:"Peumus boldus Molina",    o:"Limoncillo",                                 c:["Digestivo"],                pg:111, img:"boldo.jpg",            ficha:"fichas/boldo.jpg"},
+{no:"12",n:"Cebada",          s:"Hordeum vulgare",         o:"Cañicapa, Scarlet",                          c:["Digestivo","Urinario","Cardiovascular"], pg:112, img:"cebada.jpg",ficha:"fichas/cebada.jpg"},
+{no:"13",n:"Coco",            s:"Cocos nucifera",          o:"Cocotero, Coco de palma",                    c:["Piel","Inmune"],            pg:112, img:"coco.jpg",             ficha:"fichas/coco.jpg"},
+{no:"14",n:"Cola de caballo", s:"Equisetum giganteum",     o:"Barba de jolote, Canutillo, Carricillo",     c:["Urinario","Piel"],          pg:112, img:"coladecab.webp",  ficha:"fichas/cola-de-caballo.jpg"},
+{no:"15",n:"Encino",          s:"Quercus acatenangensis",  o:"Bans, Chicharro, Huite, Roble, Sical",       c:["Digestivo","Piel"],         pg:113, img:"encino.jpg",           ficha:"fichas/encino.jpg"},
+{no:"16",n:"Equinacea",       s:"Echinacea purpurea",      o:"Pichincha, Sampson negro",                   c:["Inmune","Respiratorio"],    pg:113, img:"echicacea.jpg",         ficha:"fichas/echinacea.jpg"},
+{no:"17",n:"Eucalipto",       s:"Eucalyptus citriodora",   o:"—",                                          c:["Respiratorio","Piel"],      pg:114, img:"eucalipto.jpg",         ficha:"fichas/eucalipto.jpg"},
+{no:"18",n:"Flor de muerto",  s:"Calendula officinalis",   o:"Botón de oro, Maravilla, Marigold",          c:["Digestivo","Piel","Ginecológico"], pg:114, img:"flor-de-muerto.jpg",ficha:"fichas/flor-de-muerto.jpg"},
+{no:"19",n:"Ginkgo biloba",   s:"Ginkgo biloba",           o:"Árbol de los 40 escudos",                    c:["Cardiovascular","Nervioso"],pg:114, img:"ginkgo-biloba.jpg",     ficha:"fichas/ginkgo-biloba.jpg"},
+{no:"20",n:"Granada",         s:"Punica granatum",         o:"—",                                          c:["Digestivo","Piel"],         pg:115, img:"granada.jpg",           ficha:"fichas/granada.jpg"},
+{no:"21",n:"Guayabo",         s:"Psidium guajava",         o:"Cak, Guava, Pichi, Posh",                    c:["Digestivo","Piel"],         pg:115, img:"guayabo.jpg",           ficha:"fichas/guayabo.jpg"},
+{no:"22",n:"Hierbabuena",     s:"Mentha spicata",          o:"Yerbabuena, menta de jardín",                c:["Digestivo","Ginecológico"], pg:116, img:"hierbabuena.jpg",       ficha:"fichas/hierbabuena.jpg"},
+{no:"23",n:"Hierba de cáncer",s:"Acalypha arvensis",       o:"Borreguillo, Cul, Corrimiento, Gusanillo",   c:["Urinario","Piel"],          pg:116, img:"hierba-de-cancer.jpg",  ficha:"fichas/hierba-de-cancer.jpg"},
+{no:"24",n:"Ixbut",           s:"Euphorbia lancifolia",    o:"Besmut, Hierba lechera, Sapillo",            c:["Ginecológico","Piel"],      pg:117, img:"ixbut.jpg",             ficha:"fichas/ixbut.jpg"},
+{no:"25",n:"Jengibre",        s:"Zingiber officinale",     o:"Totonaco, Otomí, Kion",                      c:["Digestivo","Respiratorio","Inmune"], pg:117, img:"jengibre.jpg",  ficha:"fichas/jengibre.jpg"},
+{no:"26",n:"Limón",           s:"Citrus aurantifolia",     o:"Citron, limón persa, pajarito, Key",         c:["Respiratorio","Cardiovascular","Inmune"], pg:118, img:"limon.jpg",ficha:"fichas/limon.jpg"},
+{no:"27",n:"Linaza",          s:"Linum usitatissimum",     o:"Lino, Minsal",                               c:["Digestivo","Respiratorio"], pg:118, img:"linaza.jpg",            ficha:"fichas/linaza.jpg"},
+{no:"28",n:"Llantén",         s:"Plantago major",          o:"Cola de Ardilla, Lanten, Ractzi",            c:["Digestivo","Urinario","Respiratorio","Piel"], pg:118, img:"llanten.jpg",ficha:"fichas/llanten.jpg"},
+{no:"29",n:"Maíz",            s:"Zea mays",                o:"Elote, Ixim",                                c:["Urinario","Cardiovascular"],pg:119, img:"maiz.jpg",              ficha:"fichas/maiz.jpg"},
+{no:"30",n:"Manzanilla",      s:"Matricaria recutita",     o:"Camomila, Matricaria",                       c:["Digestivo","Nervioso"],     pg:119, img:"manzanilla.jpg",        ficha:"fichas/manzanilla.jpg"},
+{no:"31",n:"Menta",           s:"Mentha piperita",         o:"Piperita",                                   c:["Digestivo","Ginecológico","Respiratorio"], pg:120, img:"menta.jpg",ficha:"fichas/menta.jpg"},
+{no:"32",n:"Orozuz",          s:"Phyla dulcis Moldenke",   o:"Orozul, Hierba dulce",                       c:["Respiratorio"],             pg:120, img:"orozuz.jpg",            ficha:"fichas/orozuz.jpg"},
+{no:"33",n:"Pericón",         s:"Tagetes lucida",          o:"Hierba Pericón, Anís, Jolomocox, Ucá",       c:["Digestivo","Ginecológico","Piel"], pg:120, img:"pericon.jpg",    ficha:"fichas/pericon.jpg"},
+{no:"34",n:"Quilete",         s:"Solanum americanum",      o:"Macuy, Hierba mora, Imut",                   c:["Piel","Inmune"],            pg:121, img:"quilete.jpg",           ficha:"fichas/quilete.jpg"},
+{no:"35",n:"Romero",          s:"Rosmarinus officinalis",  o:"—",                                          c:["Digestivo","Nervioso","Cardiovascular"], pg:121, img:"romero.jpg", ficha:"fichas/romero.jpg"},
+{no:"36",n:"Rosa de Jamaica", s:"Hibiscus sabdariffa",     o:"Rosa de Abisinia, Flor de Jamaica",          c:["Urinario","Cardiovascular","Piel"], pg:122, img:"rosa-de-jamaica.jpg",ficha:"fichas/rosa-de-jamaica.jpg"},
+{no:"37",n:"Ruda",            s:"Ruta chalepensis",        o:"Rora, Ru",                                   c:["Ginecológico","Piel","Cardiovascular"], pg:122, img:"ruda.jpg",   ficha:"fichas/ruda.jpg"},
+{no:"38",n:"Sábila",          s:"Aloe vera",               o:"Zábila",                                     c:["Digestivo","Piel"],         pg:122, img:"sabila.jpg",            ficha:"fichas/sabila.jpg"},
+{no:"39",n:"Salvia santa",    s:"Buddleja americana",      o:"Hoja blanca, Sactzam, Salvia, Tepozán",      c:["Urinario","Piel"],          pg:123, img:"salvia-santa.jpg",      ficha:"fichas/salvia-santa.jpg"},
+{no:"40",n:"Salvia sija",     s:"Lippia alba",             o:"Juanilama, Mastranto, Santa María",          c:["Digestivo","Respiratorio","Ginecológico"], pg:123, img:"salvia-sija.jpg",ficha:"fichas/salvia-sija.jpg"},
+{no:"41",n:"Té de limón",     s:"Cymbopogon citratus",     o:"Zacate limón, Limoncillo",                   c:["Respiratorio","Cardiovascular"], pg:124, img:"te-de-limon.jpg",  ficha:"fichas/te-de-limon.jpg"},
+{no:"42",n:"Té verde",        s:"Camellia sinensis",       o:"Sencha, Bancha, Atcha, Hojicha",             c:["Cardiovascular","Inmune"],  pg:124, img:"te-verde.jpg",          ficha:"fichas/te-verde.jpg"},
+{no:"43",n:"Valeriana",       s:"Valeriana officinalis",   o:"Raíz de gato, Uxe´ulew",                     c:["Nervioso","Cardiovascular"],pg:125, img:"valeriana.jpg",         ficha:"fichas/valeriana.jpg"},
+{no:"44",n:"Verbena",         s:"Verbena carolina",        o:"Chachalbe, Chichavac, Cotacám, Verbena fina",c:["Digestivo","Respiratorio","Ginecológico"], pg:125, img:"verbena.jpg",ficha:"fichas/verbena.jpg"},
+];
+
+let af="Todas";
+
+function pdfHref(pg){return`atencion-a-la-demanda-modulo-8-mspas.pdf#page=${pg}`;}
+function waHref(p){return`https://wa.me/?text=${encodeURIComponent('🌿 *'+p.n+'* ('+p.s+')\nNCPMICC-'+p.no+' — Normativa MSPAS Guatemala\n\nPlanta medicinal registrada en la Normativa de Atención Integral MSPAS, Módulo 8, página '+p.pg+'.')}`;}
+function mailHref(p){return`mailto:?subject=${encodeURIComponent('Planta medicinal: '+p.n+' — MSPAS')}&body=${encodeURIComponent('🌿 '+p.n+' ('+p.s+')\nNCPMICC-'+p.no+' — Normativa MSPAS Guatemala\n\nPlanta medicinal registrada en la Normativa de Atención Integral MSPAS, Módulo 8, página '+p.pg+'.')}`;}
+
+// ── Convierte cualquier link de Drive al formato que sí funciona ──
+function driveUrl(url){
+  if(!url) return "";
+  if(url.includes("drive.google.com/file/d/")){
+    const id=url.split("/d/")[1].split("/")[0];
+    return "https://lh3.googleusercontent.com/d/"+id;
+  }
+  if(url.includes("drive.google.com/uc") && url.includes("id=")){
+    const id=url.split("id=")[1].split("&")[0];
+    return "https://lh3.googleusercontent.com/d/"+id;
+  }
+  return url;
+}
+
+function filt(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  return P.filter(p=>{
+    const mc=af==="Todas"||p.c.includes(af);
+    const mq=!q||p.n.toLowerCase().includes(q)||p.s.toLowerCase().includes(q)||(p.o&&p.o.toLowerCase().includes(q));
+    return mc&&mq;
+  });
+}
+function rFilters(){
+  document.getElementById('frow').innerHTML=["Todas",...Object.keys(C)].map(c=>`<button class="fb${c===af?' on':''}" onclick="setF('${c}')">${c}</button>`).join('');
+}
+function setF(f){af=f;rFilters();render();}
+function onSrch(v){document.getElementById('clr').style.display=v?'block':'none';render();}
+function clrSrch(){document.getElementById('srch').value='';document.getElementById('clr').style.display='none';render();}
+
+function render(){
+  const list=filt();
+  document.getElementById('cbar').textContent=`  ${list.length} de ${P.length} plantas`;
+  document.getElementById('grid').innerHTML=list.map(p=>{
+    const pi=P.findIndex(x=>x.no===p.no);
+    const bg=p.c[0]&&C[p.c[0]]?C[p.c[0]][0]:"#EAF3DE";
+    const fg=p.c[0]&&C[p.c[0]]?C[p.c[0]][1]:"#27500A";
+    const em=EM[pi%8];
+    const tags=p.c.slice(0,2).map(c=>{const[b,f]=C[c]||["#eee","#555"];return`<span class="ptag" style="background:${b};color:${f}">${c}</span>`;}).join('');
+    const hasFicha=!!p.ficha;
+    return`<div class="card" onclick="openLb('${p.no}')">
+      <div class="cimg" style="background:${bg}">
+        ${p.img?`<img src="${driveUrl(p.img)}" alt="${p.n}" onerror="this.style.display='none';this.nextSibling.style.display='flex'">`:``}
+        <div class="cph" ${p.img?'style="display:none"':''}>
+          <i class="ti ${em}" aria-hidden="true" style="font-size:34px;color:${fg}"></i>
+          <span style="color:${fg}">próximamente</span>
+        </div>
+        ${hasFicha?`<div class="ficha-badge"><i class="ti ti-file-description" aria-hidden="true"></i>Ficha</div>`:''}
+      </div>
+      <div class="cbody">
+        <div class="cnum">NCPMICC-${p.no}</div>
+        <div class="cname">${p.n}</div>
+        <div class="csci">${p.s}</div>
+        <div class="ctags">${tags}</div>
+        <a class="clink" href="${pdfHref(p.pg)}" target="_blank" onclick="event.stopPropagation()">
+          <i class="ti ti-file-type-pdf" aria-hidden="true"></i>Normativa p.${p.pg}
+        </a>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openLb(no){
+  const p=P.find(x=>x.no===no);if(!p)return;
+  const pi=P.findIndex(x=>x.no===no);
+  const em=EM[pi%8];
+
+  document.getElementById('lbNum').textContent=`NCPMICC-${p.no}`;
+  document.getElementById('lbName').textContent=p.n;
+  document.getElementById('lbSci').textContent=p.s;
+
+  // Zona imagen
+  const wrap=document.getElementById('lbImgWrap');
+  if(p.ficha){
+    wrap.innerHTML=`<img src="${driveUrl(p.ficha)}" alt="Ficha ${p.n}" onerror="this.parentNode.innerHTML=noFichaHtml('${em}')">`;
+  } else {
+    wrap.innerHTML=noFichaHtml(em);
+  }
+
+  // Botones pie
+  document.getElementById('lbFoot').innerHTML=`
+    <a class="lbtn lbtn-norm" href="${pdfHref(p.pg)}" target="_blank">
+      <i class="ti ti-file-type-pdf" aria-hidden="true"></i>Normativa p.${p.pg}
+    </a>
+    <a class="lbtn lbtn-wa" href="${waHref(p)}" target="_blank">
+      <i class="ti ti-brand-whatsapp" aria-hidden="true"></i>WhatsApp
+    </a>
+    <a class="lbtn lbtn-mail" href="${mailHref(p)}">
+      <i class="ti ti-mail" aria-hidden="true"></i>Correo
+    </a>
+    ${p.ficha?`<a class="lbtn lbtn-dl" href="${driveUrl(p.ficha)}" download="${p.n}-NCPMICC-${p.no}.jpg">
+      <i class="ti ti-download" aria-hidden="true"></i>Guardar
+    </a>`:''}
+  `;
+
+  document.getElementById('lb').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function noFichaHtml(em){
+  return`<div class="lb-placeholder">
+    <i class="ti ${em}" aria-hidden="true"></i>
+    <p>La ficha de esta planta<br>aún no ha sido cargada.<br><span style="font-size:12px;color:#639922">Agrega el archivo en la carpeta <strong>fichas/</strong></span></p>
+  </div>`;
+}
+
+function closeLb(){
+  document.getElementById('lb').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// cerrar con Escape
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLb();});
+
+rFilters();render();
+</script>
+</body>
+</html>
